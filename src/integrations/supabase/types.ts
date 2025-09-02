@@ -7,132 +7,157 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
   }
   public: {
     Tables: {
-      admin_settings: {
-        Row: {
-          created_at: string
-          id: string
-          setting_key: string
-          setting_value: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          setting_key: string
-          setting_value: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          setting_key?: string
-          setting_value?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       admin_users: {
         Row: {
-          created_at: string
+          created_at: string | null
           id: string
-          permissions: Json | null
-          role: string
-          updated_at: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           id?: string
-          permissions?: Json | null
-          role?: string
-          updated_at?: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           id?: string
-          permissions?: Json | null
-          role?: string
-          updated_at?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
       }
-      blockchain_networks: {
+      admin_wallets: {
         Row: {
           created_at: string
-          deposit_address: string
           id: string
-          is_enabled: boolean
-          name: string
-          network_type: string
-          updated_at: string
+          is_active: boolean | null
+          network: string
+          wallet_address: string
+          wallet_type: string
         }
         Insert: {
           created_at?: string
-          deposit_address: string
           id?: string
-          is_enabled?: boolean
-          name: string
-          network_type: string
-          updated_at?: string
+          is_active?: boolean | null
+          network: string
+          wallet_address: string
+          wallet_type: string
         }
         Update: {
           created_at?: string
-          deposit_address?: string
           id?: string
-          is_enabled?: boolean
-          name?: string
-          network_type?: string
-          updated_at?: string
+          is_active?: boolean | null
+          network?: string
+          wallet_address?: string
+          wallet_type?: string
         }
         Relationships: []
+      }
+      daily_profits: {
+        Row: {
+          created_at: string
+          id: string
+          nft_plan_id: string
+          profit_amount: number
+          profit_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nft_plan_id: string
+          profit_amount: number
+          profit_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nft_plan_id?: string
+          profit_amount?: number
+          profit_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_profits_nft_plan_id_fkey"
+            columns: ["nft_plan_id"]
+            isOneToOne: false
+            referencedRelation: "nft_staking_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_profits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       deposits: {
         Row: {
           admin_notes: string | null
+          admin_wallet_id: string | null
           amount: number
-          blockchain: string
           created_at: string
-          deposit_address: string
           id: string
-          status: string
-          transaction_screenshot: string | null
+          network: string | null
+          payment_screenshot_url: string | null
+          status: string | null
+          transaction_hash: string | null
           updated_at: string
           user_id: string
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           admin_notes?: string | null
+          admin_wallet_id?: string | null
           amount: number
-          blockchain: string
           created_at?: string
-          deposit_address: string
           id?: string
-          status?: string
-          transaction_screenshot?: string | null
+          network?: string | null
+          payment_screenshot_url?: string | null
+          status?: string | null
+          transaction_hash?: string | null
           updated_at?: string
           user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           admin_notes?: string | null
+          admin_wallet_id?: string | null
           amount?: number
-          blockchain?: string
           created_at?: string
-          deposit_address?: string
           id?: string
-          status?: string
-          transaction_screenshot?: string | null
+          network?: string | null
+          payment_screenshot_url?: string | null
+          status?: string | null
+          transaction_hash?: string | null
           updated_at?: string
           user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "deposits_admin_wallet_id_fkey"
+            columns: ["admin_wallet_id"]
+            isOneToOne: false
+            referencedRelation: "admin_wallets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "deposits_user_id_fkey"
             columns: ["user_id"]
@@ -140,422 +165,191 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "deposits_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
-      logs: {
+      nft_packages: {
         Row: {
-          id: number
-          message: string | null
-          operation: string
-          timestamp: string | null
-        }
-        Insert: {
-          id?: number
-          message?: string | null
-          operation: string
-          timestamp?: string | null
-        }
-        Update: {
-          id?: number
-          message?: string | null
-          operation?: string
-          timestamp?: string | null
-        }
-        Relationships: []
-      }
-      mining_sessions: {
-        Row: {
-          created_at: string
-          id: string
-          last_claim_time: string
-          next_available_time: string
-          points_earned: number
-          session_count: number
-          session_date: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          last_claim_time?: string
-          next_available_time?: string
-          points_earned?: number
-          session_count?: number
-          session_date?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          last_claim_time?: string
-          next_available_time?: string
-          points_earned?: number
-          session_count?: number
-          session_date?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      mining_settings: {
-        Row: {
-          created_at: string
+          created_at: string | null
+          daily_profit_rate: number | null
           description: string | null
+          duration_days: number | null
           id: string
-          setting_key: string
-          setting_value: string
-          updated_at: string
+          is_active: boolean | null
+          name: string
+          price: number
+          updated_at: string | null
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
+          daily_profit_rate?: number | null
           description?: string | null
+          duration_days?: number | null
           id?: string
-          setting_key: string
-          setting_value: string
-          updated_at?: string
+          is_active?: boolean | null
+          name: string
+          price: number
+          updated_at?: string | null
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
+          daily_profit_rate?: number | null
           description?: string | null
+          duration_days?: number | null
           id?: string
-          setting_key?: string
-          setting_value?: string
-          updated_at?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number
+          updated_at?: string | null
         }
         Relationships: []
       }
-      mining_token_images: {
+      nft_staking_plans: {
         Row: {
+          amount: number
           created_at: string
+          daily_profit_rate: number | null
+          end_date: string
           id: string
-          image_url: string
-          is_active: boolean
-          updated_at: string
-          uploaded_by: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_url: string
-          is_active?: boolean
-          updated_at?: string
-          uploaded_by: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_url?: string
-          is_active?: boolean
-          updated_at?: string
-          uploaded_by?: string
-        }
-        Relationships: []
-      }
-      mining_wallets: {
-        Row: {
-          created_at: string
-          id: string
-          last_reset_date: string
-          today_claims: number
-          today_points: number
-          total_points: number
+          start_date: string
+          status: string | null
+          total_profit_earned: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          amount: number
           created_at?: string
+          daily_profit_rate?: number | null
+          end_date: string
           id?: string
-          last_reset_date?: string
-          today_claims?: number
-          today_points?: number
-          total_points?: number
+          start_date?: string
+          status?: string | null
+          total_profit_earned?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          amount?: number
           created_at?: string
+          daily_profit_rate?: number | null
+          end_date?: string
           id?: string
-          last_reset_date?: string
-          today_claims?: number
-          today_points?: number
-          total_points?: number
+          start_date?: string
+          status?: string | null
+          total_profit_earned?: number | null
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      nft_images: {
-        Row: {
-          created_at: string
-          id: string
-          image_url: string
-          is_active: boolean
-          updated_at: string
-          uploaded_by: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_url: string
-          is_active?: boolean
-          updated_at?: string
-          uploaded_by: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_url?: string
-          is_active?: boolean
-          updated_at?: string
-          uploaded_by?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          blocked_at: string | null
-          blocked_by: string | null
-          created_at: string
-          email: string | null
-          id: string
-          is_blocked: boolean | null
-          name: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          blocked_at?: string | null
-          blocked_by?: string | null
-          created_at?: string
-          email?: string | null
-          id?: string
-          is_blocked?: boolean | null
-          name?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          blocked_at?: string | null
-          blocked_by?: string | null
-          created_at?: string
-          email?: string | null
-          id?: string
-          is_blocked?: boolean | null
-          name?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      referrals: {
-        Row: {
-          created_at: string
-          id: string
-          qualification_amount: number | null
-          qualification_date: string | null
-          referral_code: string
-          referred_id: string | null
-          referrer_id: string
-          reward_amount: number | null
-          reward_paid: boolean | null
-          signup_date: string | null
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          qualification_amount?: number | null
-          qualification_date?: string | null
-          referral_code: string
-          referred_id?: string | null
-          referrer_id: string
-          reward_amount?: number | null
-          reward_paid?: boolean | null
-          signup_date?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          qualification_amount?: number | null
-          qualification_date?: string | null
-          referral_code?: string
-          referred_id?: string | null
-          referrer_id?: string
-          reward_amount?: number | null
-          reward_paid?: boolean | null
-          signup_date?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      task_settings: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          setting_key: string
-          setting_value: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          setting_key: string
-          setting_value: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          setting_key?: string
-          setting_value?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      tasks: {
-        Row: {
-          admin_notes: string | null
-          category: string
-          created_at: string
-          description: string | null
-          external_url: string | null
-          icon: string | null
-          id: string
-          is_active: boolean
-          is_recurring: boolean
-          platform: string
-          reward_points: number
-          task_type: string
-          title: string
-          updated_at: string
-          verification_type: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          category?: string
-          created_at?: string
-          description?: string | null
-          external_url?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean
-          is_recurring?: boolean
-          platform: string
-          reward_points?: number
-          task_type: string
-          title: string
-          updated_at?: string
-          verification_type?: string
-        }
-        Update: {
-          admin_notes?: string | null
-          category?: string
-          created_at?: string
-          description?: string | null
-          external_url?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean
-          is_recurring?: boolean
-          platform?: string
-          reward_points?: number
-          task_type?: string
-          title?: string
-          updated_at?: string
-          verification_type?: string
-        }
-        Relationships: []
-      }
-      user_tasks: {
-        Row: {
-          admin_notes: string | null
-          completion_date: string | null
-          created_at: string
-          id: string
-          points_earned: number
-          status: string
-          task_id: string
-          updated_at: string
-          user_id: string
-          verification_screenshot: string | null
-        }
-        Insert: {
-          admin_notes?: string | null
-          completion_date?: string | null
-          created_at?: string
-          id?: string
-          points_earned?: number
-          status?: string
-          task_id: string
-          updated_at?: string
-          user_id: string
-          verification_screenshot?: string | null
-        }
-        Update: {
-          admin_notes?: string | null
-          completion_date?: string | null
-          created_at?: string
-          id?: string
-          points_earned?: number
-          status?: string
-          task_id?: string
-          updated_at?: string
-          user_id?: string
-          verification_screenshot?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "user_tasks_task_id_fkey"
-            columns: ["task_id"]
+            foreignKeyName: "nft_staking_plans_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "tasks"
-            referencedColumns: ["id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          kyc_status: string | null
+          phone: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          kyc_status?: string | null
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          kyc_status?: string | null
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
         ]
       }
       user_wallets: {
         Row: {
           created_at: string
-          daily_earnings: number | null
           id: string
-          is_active: boolean | null
-          last_earnings_update: string | null
-          nft_maturity_date: string | null
-          total_deposit: number | null
-          total_profit: number | null
+          main_balance: number | null
+          nft_balance: number | null
+          total_deposited: number | null
+          total_withdrawn: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          daily_earnings?: number | null
           id?: string
-          is_active?: boolean | null
-          last_earnings_update?: string | null
-          nft_maturity_date?: string | null
-          total_deposit?: number | null
-          total_profit?: number | null
+          main_balance?: number | null
+          nft_balance?: number | null
+          total_deposited?: number | null
+          total_withdrawn?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
-          daily_earnings?: number | null
           id?: string
-          is_active?: boolean | null
-          last_earnings_update?: string | null
-          nft_maturity_date?: string | null
-          total_deposit?: number | null
-          total_profit?: number | null
+          main_balance?: number | null
+          nft_balance?: number | null
+          total_deposited?: number | null
+          total_withdrawn?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -563,7 +357,7 @@ export type Database = {
           {
             foreignKeyName: "user_wallets_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
@@ -571,39 +365,52 @@ export type Database = {
       }
       withdrawals: {
         Row: {
-          admin_notes: string | null
           amount: number
-          blockchain: string
           created_at: string
           id: string
-          status: string
+          network: string
+          processed_at: string | null
+          processed_by: string | null
+          status: string | null
+          transaction_hash: string | null
           updated_at: string
           user_id: string
-          wallet_address: string
+          withdraw_address: string
         }
         Insert: {
-          admin_notes?: string | null
           amount: number
-          blockchain: string
           created_at?: string
           id?: string
-          status?: string
+          network: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string | null
+          transaction_hash?: string | null
           updated_at?: string
           user_id: string
-          wallet_address: string
+          withdraw_address: string
         }
         Update: {
-          admin_notes?: string | null
           amount?: number
-          blockchain?: string
           created_at?: string
           id?: string
-          status?: string
+          network?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string | null
+          transaction_hash?: string | null
           updated_at?: string
           user_id?: string
-          wallet_address?: string
+          withdraw_address?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "withdrawals_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "withdrawals_user_id_fkey"
             columns: ["user_id"]
@@ -618,53 +425,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_admin_by_email: {
-        Args: { admin_email: string }
-        Returns: Json
-      }
-      complete_task: {
-        Args: { user_id_param: string; task_id_param: string }
-        Returns: Json
-      }
-      create_user_referral_code: {
-        Args: { user_id_param: string }
-        Returns: string
-      }
-      generate_referral_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_admin_dashboard_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      is_admin: {
-        Args: { user_id_param: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
         Returns: boolean
-      }
-      is_current_user_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      process_mining_claim: {
-        Args: { user_id_param: string }
-        Returns: Json
-      }
-      reset_daily_mining_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      transfer_daily_earnings: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      update_daily_earnings: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -791,6 +561,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

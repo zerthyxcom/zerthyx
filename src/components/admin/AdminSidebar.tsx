@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-type AdminSection = "dashboard" | "users" | "blockchain" | "deposits" | "profits" | "withdrawals" | "mining" | "settings";
+type AdminSection = "dashboard" | "users" | "blockchain" | "deposits" | "nft" | "profits" | "withdrawals" | "mining" | "settings";
 
 interface AdminSidebarProps {
   activeSection: AdminSection;
@@ -21,9 +21,10 @@ const menuItems = [
   { id: "users", label: "User Management", icon: Users },
   { id: "blockchain", label: "Blockchain Manager", icon: Network },
   { id: "deposits", label: "Deposit Management", icon: CreditCard },
+  { id: "nft", label: "NFT Management", icon: Image },
   { id: "profits", label: "NFT Profits", icon: TrendingUp },
   { id: "withdrawals", label: "Withdrawal Management", icon: ArrowUpCircle },
-  { id: "mining", label: "Mining Activity", icon: Pickaxe },
+  { id: "mining", label: "Mining Management", icon: Pickaxe },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 

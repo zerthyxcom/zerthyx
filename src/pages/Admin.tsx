@@ -10,13 +10,14 @@ import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminBlockchain } from "@/components/admin/AdminBlockchain";
 import { AdminDeposits } from "@/components/admin/AdminDeposits";
+import { AdminNFT } from "@/components/admin/AdminNFT";
 
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminWithdrawals } from "@/components/admin/AdminWithdrawals";
 import { AdminMining } from "@/components/admin/AdminMining";
 import { AdminProfits } from "@/components/admin/AdminProfits";
 
-type AdminSection = "dashboard" | "users" | "blockchain" | "deposits" | "profits" | "withdrawals" | "mining" | "settings";
+type AdminSection = "dashboard" | "users" | "blockchain" | "deposits" | "nft" | "profits" | "withdrawals" | "mining" | "settings";
 
 export default function Admin() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
@@ -61,6 +62,8 @@ export default function Admin() {
         return <AdminBlockchain />;
       case "deposits":
         return <AdminDeposits />;
+      case "nft":
+        return <AdminNFT />;
       case "profits":
         return <AdminProfits />;
       case "withdrawals":
