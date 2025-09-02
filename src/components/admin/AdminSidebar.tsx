@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Network, CreditCard, Image, Settings, ArrowUpCircle, Pickaxe, TrendingUp } from "lucide-react";
+import { LayoutDashboard, Users, Network, CreditCard, Settings, ArrowUpCircle, Pickaxe, TrendingUp, Gem } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +21,7 @@ const menuItems = [
   { id: "users", label: "User Management", icon: Users },
   { id: "blockchain", label: "Blockchain Manager", icon: Network },
   { id: "deposits", label: "Deposit Management", icon: CreditCard },
-  { id: "nft", label: "NFT Management", icon: Image },
+  { id: "nft", label: "NFT Management", icon: Gem },
   { id: "profits", label: "NFT Profits", icon: TrendingUp },
   { id: "withdrawals", label: "Withdrawal Management", icon: ArrowUpCircle },
   { id: "mining", label: "Mining Management", icon: Pickaxe },
