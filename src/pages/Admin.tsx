@@ -6,15 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
-// import { AdminDashboard } from "@/components/admin/AdminDashboard";
-// import { AdminUsers } from "@/components/admin/AdminUsers";
-// import { AdminBlockchain } from "@/components/admin/AdminBlockchain";
-// import { AdminDeposits } from "@/components/admin/AdminDeposits";
+import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminNFT } from "@/components/admin/AdminNFT";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminWithdrawals } from "@/components/admin/AdminWithdrawals";
-// import { AdminMining } from "@/components/admin/AdminMining";
-// import { AdminProfits } from "@/components/admin/AdminProfits";
+import { AdminMining } from "@/components/admin/AdminMining";
 
 type AdminSection = "dashboard" | "users" | "blockchain" | "deposits" | "nft" | "profits" | "withdrawals" | "mining" | "settings";
 
@@ -54,9 +51,9 @@ export default function Admin() {
   const renderContent = () => {
     switch (activeSection) {
       case "dashboard":
-        return <div className="p-6">Dashboard (Coming Soon)</div>;
+        return <AdminDashboard />;
       case "users":
-        return <div className="p-6">User Management (Coming Soon)</div>;
+        return <AdminUsers />;
       case "blockchain":
         return <div className="p-6">Blockchain Management (Coming Soon)</div>;
       case "deposits":
@@ -68,7 +65,7 @@ export default function Admin() {
       case "withdrawals":
         return <AdminWithdrawals />;
       case "mining":
-        return <div className="p-6">Mining Management (Coming Soon)</div>;
+        return <AdminMining />;
       case "settings":
         return <AdminSettings />;
       default:
