@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Home, Pickaxe, CheckSquare, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DashboardHome } from '@/components/dashboard/DashboardHome';
-import { DashboardMine } from '@/components/dashboard/DashboardMine';
-import { DashboardTask } from '@/components/dashboard/DashboardTask';
-import { DashboardMe } from '@/components/dashboard/DashboardMe';
+import DashboardHome from '@/components/dashboard/DashboardHome';
+import DashboardMine from '@/components/dashboard/DashboardMine';
+import DashboardTask from '@/components/dashboard/DashboardTask';
+import DashboardMe from '@/components/dashboard/DashboardMe';
 
 type TabType = 'home' | 'mine' | 'task' | 'me';
 
