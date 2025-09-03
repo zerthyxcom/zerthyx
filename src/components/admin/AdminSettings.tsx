@@ -14,47 +14,24 @@ export function AdminSettings() {
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState<Record<string, string>>({});
 
-  const { data: adminSettings } = useQuery({
-    queryKey: ["admin-settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("admin_settings")
-        .select("*");
-      
-      if (error) throw error;
-      
-      // Convert array to object for easier handling
-      const settingsObj: Record<string, string> = {};
-      data.forEach(setting => {
-        settingsObj[setting.setting_key] = setting.setting_value;
-      });
-      
-      setSettings(settingsObj);
-      return settingsObj;
-    },
-  });
+  // Local-only settings for now (DB table not present)
+  const adminSettings = {} as const;
+  // TODO: Connect to admin_settings table when available
+
 
   const updateSettingMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const { error } = await supabase
-        .from("admin_settings")
-        .upsert({
-          setting_key: key,
-          setting_value: value,
-        }, {
-          onConflict: "setting_key"
-        });
-
-      if (error) throw error;
+      // Simulate save (no backend table wired yet)
+      return Promise.resolve();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
       toast({
         title: "Settings updated",
-        description: "Admin settings have been updated successfully.",
+        description: "Saved locally. Connect DB to persist.",
       });
     },
   });
+
 
   const handleSave = () => {
     Object.entries(settings).forEach(([key, value]) => {

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Wallet, DollarSign } from "lucide-react";
@@ -42,6 +42,50 @@ export function AdminDashboard() {
     },
   ];
 
+  const [activities, setActivities] = useState<Array<{ id: string; type: 'deposit' | 'withdrawal'; message: string; created_at: string }>>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadInitial = async () => {
+      try {
+        const [{ data: deps }, { data: withds }] = await Promise.all([
+          supabase.from('deposits').select('id, amount, status, created_at').order('created_at', { ascending: false }).limit(5),
+          supabase.from('withdrawals').select('id, amount, status, created_at').order('created_at', { ascending: false }).limit(5),
+        ]);
+        const items = [
+          ...(deps || []).map(d => ({ id: d.id, type: 'deposit' as const, message: `Deposit ${d.status}: $${Number(d.amount).toLocaleString()}`, created_at: d.created_at })),
+          ...(withds || []).map(w => ({ id: w.id, type: 'withdrawal' as const, message: `Withdrawal ${w.status}: $${Number(w.amount).toLocaleString()}`, created_at: w.created_at })),
+        ]
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 5);
+        if (isMounted) setActivities(items);
+      } catch (e) {
+        console.error('Failed to load recent activity', e);
+      }
+    };
+
+    const channel = supabase
+      .channel('admin-activity')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deposits' }, (payload) => {
+        const r: any = payload.new || payload.old;
+        const item = { id: r.id, type: 'deposit' as const, message: `Deposit ${r.status}: $${Number(r.amount).toLocaleString()}`, created_at: r.created_at };
+        setActivities(prev => [item, ...prev].sort((a,b)=> new Date(b.created_at).getTime()-new Date(a.created_at).getTime()).slice(0,5));
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'withdrawals' }, (payload) => {
+        const r: any = payload.new || payload.old;
+        const item = { id: r.id, type: 'withdrawal' as const, message: `Withdrawal ${r.status}: $${Number(r.amount).toLocaleString()}`, created_at: r.created_at };
+        setActivities(prev => [item, ...prev].sort((a,b)=> new Date(b.created_at).getTime()-new Date(a.created_at).getTime()).slice(0,5));
+      })
+      .subscribe();
+
+    loadInitial();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>
@@ -78,20 +122,19 @@ export function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div>
-                  <p className="font-medium">New user registered</p>
-                  <p className="text-sm text-muted-foreground">5 minutes ago</p>
-                </div>
-                <span className="text-green-600 text-sm">+1 User</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div>
-                  <p className="font-medium">Deposit approved</p>
-                  <p className="text-sm text-muted-foreground">12 minutes ago</p>
-                </div>
-                <span className="text-green-600 text-sm">+$500</span>
-              </div>
+              {activities.length === 0 ? (
+                <div className="text-center py-4 text-muted-foreground">No recent activity</div>
+              ) : (
+                activities.map((a) => (
+                  <div key={`${a.type}-${a.id}`} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div>
+                      <p className="font-medium">{a.message}</p>
+                      <p className="text-sm text-muted-foreground">{new Date(a.created_at).toLocaleString()}</p>
+                    </div>
+                    <span className="text-green-600 text-sm">{a.type === 'deposit' ? '+ Deposit' : 'Withdrawal'}</span>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

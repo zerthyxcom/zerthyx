@@ -72,13 +72,13 @@ export function AdminDeposits() {
   });
 
   const approveDepositMutation = useMutation({
-    mutationFn: async ({ depositId, amount }: { depositId: string; amount: number }) => {
-      console.log("Approving deposit:", depositId, "Amount:", amount);
-      
-      // Get deposit info first
+    mutationFn: async ({ depositId }: { depositId: string }) => {
+      console.log("Approving deposit:", depositId);
+
+      // Get deposit info first (including amount & user_id)
       const { data: deposit, error: depositFetchError } = await supabase
         .from("deposits")
-        .select("user_id")
+        .select("user_id, amount")
         .eq("id", depositId)
         .maybeSingle();
 
@@ -91,11 +91,14 @@ export function AdminDeposits() {
         throw new Error("Deposit not found");
       }
 
+      const amount = Number(deposit.amount || 0);
+
       // Update deposit status
       const { error: depositError } = await supabase
         .from("deposits")
         .update({ 
-          status: "approved"
+          status: "approved",
+          verified_at: new Date().toISOString(),
         })
         .eq("id", depositId);
 
@@ -113,7 +116,7 @@ export function AdminDeposits() {
 
       if (existingWallet) {
         // Update existing wallet
-        const newTotalDeposited = (existingWallet.total_deposited || 0) + amount;
+        const newTotalDeposited = Number(existingWallet.total_deposited || 0) + amount;
         const { error: walletError } = await supabase
           .from("user_wallets")
           .update({
@@ -164,6 +167,7 @@ export function AdminDeposits() {
     }
   });
 
+
   const rejectDepositMutation = useMutation({
     mutationFn: async (depositId: string) => {
       console.log("Rejecting deposit:", depositId);
@@ -199,20 +203,10 @@ export function AdminDeposits() {
   });
 
   const handleApprove = () => {
-    if (!selectedDeposit || !approvalAmount) {
+    if (!selectedDeposit) {
       toast({
         title: "Error",
-        description: "Please enter the USDT amount to approve.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    const amount = parseFloat(approvalAmount);
-    if (amount <= 0) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid amount greater than 0.",
+        description: "No deposit selected.",
         variant: "destructive",
       });
       return;
@@ -220,9 +214,9 @@ export function AdminDeposits() {
 
     approveDepositMutation.mutate({
       depositId: selectedDeposit.id,
-      amount: amount,
     });
   };
+
 
   const exportToCSV = () => {
     if (!depositHistory || depositHistory.length === 0) {
@@ -376,19 +370,7 @@ export function AdminDeposits() {
                                   <div className="space-y-2">
                                     <p><strong>User ID:</strong> {selectedDeposit?.user_id ? selectedDeposit.user_id.slice(0,8) + "..." : "Unknown"}</p>
                                     <p><strong>Network:</strong> {selectedDeposit?.network}</p>
-                                    <p><strong>Requested Amount:</strong> ${selectedDeposit?.amount}</p>
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="amount">Approve USDT Amount</Label>
-                                    <Input
-                                      id="amount"
-                                      type="number"
-                                      step="0.01"
-                                      min="0"
-                                      value={approvalAmount}
-                                      onChange={(e) => setApprovalAmount(e.target.value)}
-                                      placeholder="Enter USDT amount to approve"
-                                    />
+                                    <p><strong>Amount:</strong> ${selectedDeposit?.amount}</p>
                                   </div>
                                   <Button 
                                     onClick={handleApprove} 
