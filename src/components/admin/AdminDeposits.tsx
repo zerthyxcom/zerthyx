@@ -39,13 +39,7 @@ export function AdminDeposits() {
       console.log("Fetching pending deposits...");
       const { data, error } = await supabase
         .from("deposits")
-        .select(`
-          *,
-          profiles (
-            name,
-            email
-          )
-        `)
+        .select("*")
         .eq("status", "pending")
         .order("created_at", { ascending: false });
       
@@ -64,13 +58,7 @@ export function AdminDeposits() {
       console.log("Fetching deposit history...");
       const { data, error } = await supabase
         .from("deposits")
-        .select(`
-          *,
-          profiles (
-            name,
-            email
-          )
-        `)
+        .select("*")
         .in("status", ["approved", "rejected"])
         .order("created_at", { ascending: false });
       
@@ -123,17 +111,13 @@ export function AdminDeposits() {
         .eq("user_id", deposit.user_id)
         .maybeSingle();
 
-      const maturityDate = new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString();
-
       if (existingWallet) {
         // Update existing wallet
-        const newTotalDeposit = (existingWallet.total_deposit || 0) + amount;
+        const newTotalDeposited = (existingWallet.total_deposited || 0) + amount;
         const { error: walletError } = await supabase
           .from("user_wallets")
           .update({
-            total_deposit: newTotalDeposit,
-            is_active: true,
-            nft_maturity_date: maturityDate,
+            total_deposited: newTotalDeposited,
             updated_at: new Date().toISOString()
           })
           .eq("user_id", deposit.user_id);
@@ -148,11 +132,8 @@ export function AdminDeposits() {
           .from("user_wallets")
           .insert({
             user_id: deposit.user_id,
-            total_deposit: amount,
-            daily_earnings: 0,
-            total_profit: 0,
-            is_active: true,
-            nft_maturity_date: maturityDate
+            total_deposited: amount,
+            updated_at: new Date().toISOString()
           });
 
         if (walletError) {
@@ -254,12 +235,10 @@ export function AdminDeposits() {
     }
 
     const csvContent = [
-      ["User ID", "User Name", "Email", "Blockchain", "Amount", "Date", "Status"],
+      ["User ID", "Network", "Amount", "Date", "Status"],
       ...depositHistory.map(deposit => [
         deposit.user_id.slice(0, 8) + "...",
-        deposit.profiles?.name || "N/A",
-        deposit.profiles?.email || "N/A",
-        deposit.blockchain,
+        deposit.network,
         deposit.amount,
         new Date(deposit.created_at).toLocaleDateString(),
         deposit.status
@@ -331,29 +310,27 @@ export function AdminDeposits() {
                     {pendingDeposits?.map((deposit) => (
                       <TableRow key={deposit.id}>
                         <TableCell>
-                          <div>
-                             <p className="font-medium">{deposit.profiles?.name || "Unknown User"}</p>
-                             <p className="text-sm text-muted-foreground">{deposit.profiles?.email || "No email"}</p>
-                             <p className="text-xs text-muted-foreground font-mono">
-                               ID: {deposit.user_id.slice(0, 8)}...
-                             </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{deposit.blockchain}</Badge>
+                             <div>
+                               <p className="text-xs text-muted-foreground font-mono">
+                                 ID: {deposit.user_id.slice(0, 8)}...
+                               </p>
+                             </div>
+                           </TableCell>
+                           <TableCell>
+                             <Badge variant="outline">{deposit.network}</Badge>
                         </TableCell>
                         <TableCell>
                           <span className="font-medium">${deposit.amount}</span>
                         </TableCell>
                         <TableCell>
-                          {deposit.transaction_screenshot ? (
+                          {deposit.payment_screenshot_url ? (
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={async () => {
                                 const { data } = supabase.storage
                                   .from('transaction-screenshots')
-                                  .getPublicUrl(deposit.transaction_screenshot);
+                                  .getPublicUrl(deposit.payment_screenshot_url);
                                 setViewingScreenshot(data.publicUrl);
                               }}
                             >
@@ -397,9 +374,8 @@ export function AdminDeposits() {
                                 </DialogHeader>
                                 <div className="space-y-4">
                                   <div className="space-y-2">
-                                    <p><strong>User:</strong> {selectedDeposit?.profiles?.name || "Unknown"}</p>
-                                    <p><strong>Email:</strong> {selectedDeposit?.profiles?.email || "N/A"}</p>
-                                    <p><strong>Blockchain:</strong> {selectedDeposit?.blockchain}</p>
+                                    <p><strong>User ID:</strong> {selectedDeposit?.user_id ? selectedDeposit.user_id.slice(0,8) + "..." : "Unknown"}</p>
+                                    <p><strong>Network:</strong> {selectedDeposit?.network}</p>
                                     <p><strong>Requested Amount:</strong> ${selectedDeposit?.amount}</p>
                                   </div>
                                   <div>
@@ -429,7 +405,7 @@ export function AdminDeposits() {
                               variant="destructive"
                               size="sm"
                               onClick={() => {
-                                if (window.confirm(`Are you sure you want to reject this deposit from ${deposit.profiles?.name || 'Unknown User'}?`)) {
+                                if (window.confirm(`Are you sure you want to reject this deposit from User ${deposit.user_id.slice(0,8)}...?`)) {
                                   rejectDepositMutation.mutate(deposit.id);
                                 }
                               }}
@@ -484,19 +460,17 @@ export function AdminDeposits() {
                      {depositHistory?.map((deposit) => (
                          <TableRow key={deposit.id}>
                            <TableCell>
-                             <div>
-                               <p className="font-medium">{deposit.profiles?.name || "Unknown User"}</p>
-                               <p className="text-sm text-muted-foreground">{deposit.profiles?.email || "No email"}</p>
-                               <p className="text-xs text-muted-foreground font-mono">
-                                 ID: {deposit.user_id.slice(0, 8)}...
-                               </p>
-                             </div>
-                           </TableCell>
-                           <TableCell>
-                             <Badge variant="outline">{deposit.blockchain}</Badge>
-                           </TableCell>
-                           <TableCell>
-                             <span className="font-medium">${deposit.amount}</span>
+                               <div>
+                                 <p className="text-xs text-muted-foreground font-mono">
+                                   ID: {deposit.user_id.slice(0, 8)}...
+                                 </p>
+                               </div>
+                             </TableCell>
+                             <TableCell>
+                               <Badge variant="outline">{deposit.network}</Badge>
+                             </TableCell>
+                             <TableCell>
+                               <span className="font-medium">${deposit.amount}</span>
                            </TableCell>
                            <TableCell>
                              <div className="text-sm">

@@ -4,38 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Wallet, DollarSign } from "lucide-react";
 
 export function AdminDashboard() {
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ["admin-dashboard-stats"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_admin_dashboard_stats");
-      if (error) throw error;
-      return data as {
-        total_deposits: number;
-        active_users: number;
-        total_nft_locked: number;
-        today_profit: number;
-      };
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="h-4 bg-muted rounded w-24"></div>
-              <div className="h-4 w-4 bg-muted rounded"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-8 bg-muted rounded w-32 mb-2"></div>
-              <div className="h-3 bg-muted rounded w-20"></div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
+  const stats = {
+    total_deposits: 0,
+    active_users: 0,
+    total_nft_locked: 0,
+    today_profit: 0,
+  };
 
   const statCards = [
     {

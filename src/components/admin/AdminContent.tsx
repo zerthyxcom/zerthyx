@@ -53,10 +53,12 @@ export function AdminContent() {
       
       const { error } = await supabase
         .from(table)
-        .insert([{
-          image_url: imageUrl,
-          uploaded_by: user.id,
-        }]);
+        .insert([
+          {
+            name: file.name,
+            image_url: imageUrl,
+          },
+        ]);
 
       if (error) throw error;
     },
