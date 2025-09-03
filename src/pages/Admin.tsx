@@ -6,15 +6,15 @@ import { useToast } from "@/hooks/use-toast";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
-import { AdminDashboard } from "@/components/admin/AdminDashboard";
-import { AdminUsers } from "@/components/admin/AdminUsers";
-import { AdminBlockchain } from "@/components/admin/AdminBlockchain";
-import { AdminDeposits } from "@/components/admin/AdminDeposits";
+// import { AdminDashboard } from "@/components/admin/AdminDashboard";
+// import { AdminUsers } from "@/components/admin/AdminUsers";
+// import { AdminBlockchain } from "@/components/admin/AdminBlockchain";
+// import { AdminDeposits } from "@/components/admin/AdminDeposits";
 import { AdminNFT } from "@/components/admin/AdminNFT";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminWithdrawals } from "@/components/admin/AdminWithdrawals";
-import { AdminMining } from "@/components/admin/AdminMining";
-import { AdminProfits } from "@/components/admin/AdminProfits";
+// import { AdminMining } from "@/components/admin/AdminMining";
+// import { AdminProfits } from "@/components/admin/AdminProfits";
 
 type AdminSection = "dashboard" | "users" | "blockchain" | "deposits" | "nft" | "profits" | "withdrawals" | "mining" | "settings";
 
@@ -54,25 +54,25 @@ export default function Admin() {
   const renderContent = () => {
     switch (activeSection) {
       case "dashboard":
-        return <AdminDashboard />;
+        return <div className="p-6">Dashboard (Coming Soon)</div>;
       case "users":
-        return <AdminUsers />;
+        return <div className="p-6">User Management (Coming Soon)</div>;
       case "blockchain":
-        return <AdminBlockchain />;
+        return <div className="p-6">Blockchain Management (Coming Soon)</div>;
       case "deposits":
-        return <AdminDeposits />;
+        return <div className="p-6">Deposit Management (Coming Soon)</div>;
       case "nft":
         return <AdminNFT />;
       case "profits":
-        return <AdminProfits />;
+        return <div className="p-6">Profit Management (Coming Soon)</div>;
       case "withdrawals":
         return <AdminWithdrawals />;
       case "mining":
-        return <AdminMining />;
+        return <div className="p-6">Mining Management (Coming Soon)</div>;
       case "settings":
         return <AdminSettings />;
       default:
-        return <AdminDashboard />;
+        return <div className="p-6">Dashboard (Coming Soon)</div>;
     }
   };
 

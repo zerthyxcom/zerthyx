@@ -62,6 +62,33 @@ export type Database = {
         }
         Relationships: []
       }
+      blockchain_networks: {
+        Row: {
+          created_at: string | null
+          deposit_address: string
+          id: string
+          is_enabled: boolean | null
+          name: string
+          network_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          deposit_address: string
+          id?: string
+          is_enabled?: boolean | null
+          name: string
+          network_type: string
+        }
+        Update: {
+          created_at?: string | null
+          deposit_address?: string
+          id?: string
+          is_enabled?: boolean | null
+          name?: string
+          network_type?: string
+        }
+        Relationships: []
+      }
       daily_profits: {
         Row: {
           created_at: string
@@ -174,6 +201,54 @@ export type Database = {
           },
         ]
       }
+      mining_token_images: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
+      nft_images: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
       nft_packages: {
         Row: {
           created_at: string | null
@@ -217,6 +292,10 @@ export type Database = {
           daily_profit_rate: number | null
           end_date: string
           id: string
+          individual_end_date: string | null
+          individual_start_date: string | null
+          is_released: boolean | null
+          release_date: string | null
           start_date: string
           status: string | null
           total_profit_earned: number | null
@@ -229,6 +308,10 @@ export type Database = {
           daily_profit_rate?: number | null
           end_date: string
           id?: string
+          individual_end_date?: string | null
+          individual_start_date?: string | null
+          is_released?: boolean | null
+          release_date?: string | null
           start_date?: string
           status?: string | null
           total_profit_earned?: number | null
@@ -241,6 +324,10 @@ export type Database = {
           daily_profit_rate?: number | null
           end_date?: string
           id?: string
+          individual_end_date?: string | null
+          individual_start_date?: string | null
+          is_released?: boolean | null
+          release_date?: string | null
           start_date?: string
           status?: string | null
           total_profit_earned?: number | null
@@ -431,6 +518,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      release_completed_nft_deposits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
